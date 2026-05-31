@@ -1,8 +1,9 @@
 ﻿import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const apiKey = process.env.GOOGLE_API_KEY;
-const embeddingModel = process.env.GOOGLE_EMBEDDING_MODEL ?? 'textembedding-gecko-001';
-const generationModel = process.env.GOOGLE_GEN_MODEL ?? 'text-bison-001';
+const apiVersion = process.env.GOOGLE_API_VERSION ?? 'v1';
+const embeddingModel = process.env.GOOGLE_EMBEDDING_MODEL ?? 'gemini-embedding-001';
+const generationModel = process.env.GOOGLE_GEN_MODEL ?? 'gemini-2.5-flash';
 
 if (!apiKey) {
   console.warn('Missing GOOGLE_API_KEY. Document indexing and answer generation require a valid key.');
@@ -11,7 +12,7 @@ if (!apiKey) {
 const googleAI = new GoogleGenerativeAI(apiKey ?? '');
 
 function getModel(modelName: string) {
-  return googleAI.getGenerativeModel({ model: modelName });
+  return googleAI.getGenerativeModel({ model: modelName }, { apiVersion });
 }
 
 function extractText(response: any): string {
@@ -19,6 +20,14 @@ function extractText(response: any): string {
   if (!candidate) return '';
   const parts = candidate.content?.parts ?? [];
   return parts.map((part: any) => part.text ?? '').join('').trim();
+}
+
+function getEmbeddingValues(response: any): number[] {
+  const values = response?.values ?? response?.embedding?.values;
+  if (!Array.isArray(values)) {
+    throw new Error('Google embedding response missing values');
+  }
+  return values;
 }
 
 export async function embedTexts(texts: string[]): Promise<number[][]> {
@@ -32,13 +41,17 @@ export async function embedTexts(texts: string[]): Promise<number[][]> {
     })),
   });
 
-  return response.embeddings.map((embedding: any) => embedding.embedding.values);
+  if (!Array.isArray(response.embeddings)) {
+    throw new Error('Google batch embedding response missing embeddings');
+  }
+
+  return response.embeddings.map((embedding: any) => getEmbeddingValues(embedding));
 }
 
 export async function getEmbedding(text: string): Promise<number[]> {
   const model = getModel(embeddingModel);
   const response = await model.embedContent(text);
-  return response.embedding.values;
+  return getEmbeddingValues(response);
 }
 
 export async function createAnswer(prompt: string): Promise<string> {

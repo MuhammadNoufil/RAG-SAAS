@@ -12,7 +12,9 @@ export interface LocalVectorRecord {
   };
 }
 
-const usePinecone = Boolean(process.env.PINECONE_API_KEY && process.env.PINECONE_INDEX_NAME);
+const usePinecone =
+  process.env.PINECONE_USE?.toLowerCase() === 'true' &&
+  Boolean(process.env.PINECONE_API_KEY && process.env.PINECONE_INDEX_NAME);
 
 let pineconeClient: Pinecone | null = null;
 let pineconeIndex: any = null;
@@ -47,11 +49,24 @@ async function getIndex() {
 }
 
 export async function upsertEmbeddings(records: LocalVectorRecord[]) {
+  if (records.length === 0) {
+    return;
+  }
+
   if (usePinecone) {
     const index = await getIndex();
     if (!index) throw new Error('Unable to initialize Pinecone index.');
 
-    await index.upsert({ vectors: records.map((record) => ({ id: record.id, values: record.values, metadata: record.metadata })) });
+    try {
+      await index.upsert({ records: records.map((record) => ({ id: record.id, values: record.values, metadata: record.metadata })) });
+    } catch (error) {
+      if (error instanceof Error && /dimension/i.test(error.message)) {
+        throw new Error(
+          'Pinecone index dimension mismatch. This app currently produces 3072-dimensional embeddings; create the Pinecone index with dimension 3072 or disable Pinecone by setting PINECONE_USE=false.',
+        );
+      }
+      throw error;
+    }
     return;
   }
 

@@ -1,6 +1,4 @@
-﻿'use client';
-
-import { useState } from 'react';
+﻿import { useState } from 'react';
 
 interface UploadBoxProps {
   onUploadSuccess: (fileName: string) => void;
@@ -33,7 +31,7 @@ export default function UploadBox({ onUploadSuccess }: UploadBoxProps) {
       }
 
       onUploadSuccess(data.fileName || file.name);
-      setMessage(`Uploaded ${file.name}. ${data.documentCount} chunks indexed.`);
+      setMessage(`Uploaded ${file.name}. ${data.documentCount ?? 'Document'} indexed.`);
     } catch (error) {
       setMessage(`Upload error: ${(error as Error).message}`);
     } finally {
@@ -45,16 +43,29 @@ export default function UploadBox({ onUploadSuccess }: UploadBoxProps) {
   };
 
   return (
-    <div className="mt-6 space-y-4">
-      <label className="inline-flex w-full cursor-pointer items-center justify-between rounded-3xl border border-slate-800 bg-slate-900/90 px-4 py-4 text-left shadow-sm shadow-slate-950/10 transition hover:border-cyan-400/40">
-        <div>
-          <p className="text-sm font-semibold text-slate-100">Upload document</p>
-          <p className="mt-1 text-xs text-slate-400">PDF, DOCX, TXT, HTML</p>
+    <div data-aos="fade-up" className="mt-6 space-y-4">
+      <label className="group block cursor-pointer rounded-[28px] border border-dashed border-slate-700 bg-slate-900/90 p-6 text-center transition hover:border-cyan-400/40 hover:bg-slate-900">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-800 text-cyan-300 shadow-inner shadow-cyan-500/10">
+          <span className="text-2xl">⇪</span>
         </div>
-        <span className="rounded-full bg-cyan-500 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-slate-950">Browse</span>
-        <input type="file" accept=".pdf,.docx,.doc,.txt,.html" onChange={handleFileChange} className="hidden" disabled={uploading} />
+        <div className="mt-5 space-y-3">
+          <p className="text-lg font-semibold text-white">Upload or browse files</p>
+          <p className="text-sm leading-6 text-slate-400">PDF, DOCX, TXT, HTML</p>
+          <p className="text-sm text-slate-500">{uploading ? 'Indexing your document...' : message}</p>
+        </div>
+        <input
+          type="file"
+          accept=".pdf,.docx,.doc,.txt,.html"
+          onChange={handleFileChange}
+          className="hidden"
+          disabled={uploading}
+        />
       </label>
-      <p className="text-sm text-slate-400">{message}</p>
+      <div data-aos="fade-up" data-aos-delay="80" className="flex flex-wrap gap-3 text-sm text-slate-500">
+        <span className="rounded-full bg-slate-900/80 px-3 py-1">Automatic text extraction</span>
+        <span className="rounded-full bg-slate-900/80 px-3 py-1">Secure upload</span>
+        <span className="rounded-full bg-slate-900/80 px-3 py-1">Instant indexing</span>
+      </div>
     </div>
   );
 }

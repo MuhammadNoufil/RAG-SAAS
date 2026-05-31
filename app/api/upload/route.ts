@@ -21,7 +21,21 @@ export async function POST(request: Request) {
     }
 
     const chunks = chunkText(text, 900, 120);
+    if (chunks.length === 0) {
+      return NextResponse.json({ error: 'No text chunks could be generated from the uploaded file' }, { status: 400 });
+    }
+
     const embeddings = await embedTexts(chunks);
+    if (embeddings.length === 0) {
+      return NextResponse.json({ error: 'No embeddings were produced for the uploaded file' }, { status: 500 });
+    }
+
+    if (embeddings.length !== chunks.length) {
+      return NextResponse.json(
+        { error: 'Embedding count does not match chunk count; upload aborted' },
+        { status: 500 },
+      );
+    }
 
     const vectors = chunks.map((chunk, index) => ({
       id: `${fileName}-${index}-${Math.random().toString(36).slice(2, 10)}`,

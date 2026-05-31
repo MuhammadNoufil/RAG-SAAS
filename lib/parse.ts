@@ -11,7 +11,8 @@ export async function parseFile(file: File, fileName: string): Promise<string> {
 
     if (typeof window === 'undefined') {
       const worker = await import('pdfjs-dist/legacy/build/pdf.worker.mjs');
-      globalThis.pdfjsWorker ||= { WorkerMessageHandler: worker.WorkerMessageHandler };
+      const globalAny = globalThis as any;
+      globalAny.pdfjsWorker ||= { WorkerMessageHandler: worker.WorkerMessageHandler };
     }
 
     const loadingTask = pdfjs.getDocument({ data: uint8Array });
