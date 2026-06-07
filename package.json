@@ -9,8 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
-    "@pinecone-database/pinecone": "^7.2.0",
+    "@anthropic-ai/sdk": "^0.28.0",
+    "@huggingface/inference": "^2.6.0",
+    "chromadb": "^1.5.0",
     "aos": "^2.3.4",
     "clsx": "^2.1.1",
     "framer-motion": "^12.40.0",

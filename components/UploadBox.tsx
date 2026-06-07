@@ -44,14 +44,14 @@ export default function UploadBox({ onUploadSuccess }: UploadBoxProps) {
 
   return (
     <div data-aos="fade-up" className="mt-6 space-y-4">
-      <label className="group block cursor-pointer rounded-[28px] border border-dashed border-slate-700 bg-slate-900/90 p-6 text-center transition hover:border-cyan-400/40 hover:bg-slate-900">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-800 text-cyan-300 shadow-inner shadow-cyan-500/10">
-          <span className="text-2xl">⇪</span>
+      <label className="group block cursor-pointer rounded-[28px] border border-dashed border-slate-700 bg-slate-900/90 p-6 text-center transition-smooth hover:border-cyan-400/40 hover:bg-slate-900/70 hover:shadow-lg hover:shadow-cyan-500/10">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-800 text-cyan-300 shadow-inner shadow-cyan-500/10 transition-smooth group-hover:bg-slate-700 group-hover:shadow-cyan-500/20">
+          <span className={`text-2xl transition-smooth ${uploading ? 'animate-pulse-smooth' : 'group-hover:scale-110'}`}>⇪</span>
         </div>
         <div className="mt-5 space-y-3">
-          <p className="text-lg font-semibold text-white">Upload or browse files</p>
+          <p className="text-lg font-semibold text-white transition-smooth group-hover:text-cyan-300">{uploading ? 'Indexing your document...' : 'Upload or browse files'}</p>
           <p className="text-sm leading-6 text-slate-400">PDF, DOCX, TXT, HTML</p>
-          <p className="text-sm text-slate-500">{uploading ? 'Indexing your document...' : message}</p>
+          <p className={`text-sm transition-smooth ${uploading ? 'text-cyan-400 animate-pulse-smooth' : 'text-slate-500'}`}>{uploading ? 'Processing...' : message}</p>
         </div>
         <input
           type="file"
@@ -62,9 +62,9 @@ export default function UploadBox({ onUploadSuccess }: UploadBoxProps) {
         />
       </label>
       <div data-aos="fade-up" data-aos-delay="80" className="flex flex-wrap gap-3 text-sm text-slate-500">
-        <span className="rounded-full bg-slate-900/80 px-3 py-1">Automatic text extraction</span>
-        <span className="rounded-full bg-slate-900/80 px-3 py-1">Secure upload</span>
-        <span className="rounded-full bg-slate-900/80 px-3 py-1">Instant indexing</span>
+        <span className="rounded-full bg-slate-900/80 px-3 py-1 transition-smooth hover:bg-slate-800 hover:text-slate-400">Automatic text extraction</span>
+        <span className="rounded-full bg-slate-900/80 px-3 py-1 transition-smooth hover:bg-slate-800 hover:text-slate-400">Secure upload</span>
+        <span className="rounded-full bg-slate-900/80 px-3 py-1 transition-smooth hover:bg-slate-800 hover:text-slate-400">Instant indexing</span>
       </div>
     </div>
   );

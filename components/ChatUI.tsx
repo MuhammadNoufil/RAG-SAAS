@@ -90,6 +90,11 @@ export default function ChatUI() {
     setStatus(`Indexed ${fileName}. Ask a question now.`);
   };
 
+  const handleDocumentDelete = (documentId: string) => {
+    setDocuments((current) => current.filter((doc) => doc !== documentId));
+    setStatus(`${documentId} has been removed from your workspace.`);
+  };
+
   const canSubmit = Boolean(question.trim() && hasDocuments && !loading);
   const recentCitations = useMemo(() => citations.filter((item) => item.text && item.source), [citations]);
 
@@ -106,7 +111,7 @@ export default function ChatUI() {
               <div className="space-y-4">
                 <h1 data-aos="slide-right" data-aos-delay="120" data-aos-duration="1200" className="font-display text-4xl font-semibold tracking-tight text-white sm:text-5xl text-glow">Modern document chat with smarter responses</h1>
                 <p data-aos="slide-right" data-aos-delay="240" data-aos-duration="1300" className="max-w-2xl text-lg leading-8 text-slate-300">
-                  Upload PDFs, DOCX, TXT, or HTML files and let the AI answer questions from your own knowledge base. The interface is fully responsive, clean, and optimized for fast workflows.
+                  Upload PDFs, DOCX, TXT, or HTML files and let Claude answer questions from your own knowledge base. The interface is fully responsive, clean, and optimized for fast workflows.
                 </p>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -148,14 +153,14 @@ export default function ChatUI() {
               <UploadBox onUploadSuccess={handleUploadSuccess} />
             </div>
 
-            <Sidebar documents={documents} />
+            <Sidebar documents={documents} onDocumentDelete={handleDocumentDelete} />
           </aside>
 
           <main className="space-y-6" data-aos="fade-left">
             <div className="rounded-[32px] border border-white/10 bg-slate-950/90 p-6 shadow-2xl shadow-slate-950/20 backdrop-blur-xl">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h2 className="text-xl font-semibold text-white">AI chat console</h2>
+                  <h2 className="text-xl font-semibold text-white">Claude AI chat console</h2>
                   <p className="mt-1 text-sm text-slate-400">Ask questions and review answers that are grounded in the documents you uploaded.</p>
                 </div>
                 <div className="inline-flex items-center gap-3 rounded-3xl bg-slate-900/80 px-4 py-3 text-sm text-slate-300 ring-1 ring-slate-700">
@@ -186,7 +191,7 @@ export default function ChatUI() {
                       type="button"
                       onClick={sendQuestion}
                       disabled={!canSubmit}
-                      className="inline-flex min-h-[140px] w-full items-center justify-center rounded-[24px] bg-cyan-500 px-6 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:bg-cyan-500/50 sm:w-auto"
+                      className="btn-hover-lift inline-flex min-h-[140px] w-full items-center justify-center rounded-[24px] bg-cyan-500 px-6 text-sm font-semibold text-slate-950 transition-smooth disabled:cursor-not-allowed disabled:bg-cyan-500/50 sm:w-auto"
                     >
                       {loading ? 'Waiting...' : 'Send question'}
                     </button>

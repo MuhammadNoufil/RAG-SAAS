@@ -2,7 +2,7 @@
 import { parseFile } from '@/lib/parse';
 import { chunkText } from '@/lib/chunk';
 import { embedTexts } from '@/lib/embed';
-import { upsertEmbeddings } from '@/lib/pinecone';
+import { upsertEmbeddings } from '@/lib/chroma';
 
 export async function POST(request: Request) {
   try {
@@ -20,7 +20,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Uploaded file is empty or not supported' }, { status: 400 });
     }
 
-    const chunks = chunkText(text, 900, 120);
+    // Smaller chunks to better isolate document sections (EDUCATION, EXPERIENCE, etc)
+    const chunks = chunkText(text, 400, 60);
     if (chunks.length === 0) {
       return NextResponse.json({ error: 'No text chunks could be generated from the uploaded file' }, { status: 400 });
     }

@@ -23,13 +23,29 @@ export async function parseFile(file: File, fileName: string): Promise<string> {
       for (let pageNum = 1; pageNum <= pdf.numPages; pageNum += 1) {
         const page = await pdf.getPage(pageNum);
         const content = await page.getTextContent();
-        const pageText = content.items
-          .map((item: any) => ('str' in item ? item.str : ''))
-          .filter(Boolean)
-          .join(' ');
-        pages.push(pageText);
+        
+        // Group items by Y position to preserve line structure
+        const lineMap = new Map<number, string[]>();
+        content.items.forEach((item: any) => {
+          if ('str' in item && item.str.trim()) {
+            const y = Math.round(item.y); // Group by Y coordinate
+            if (!lineMap.has(y)) {
+              lineMap.set(y, [item.str]);
+            } else {
+              lineMap.get(y)!.push(item.str);
+            }
+          }
+        });
+        
+        // Sort by Y position (top to bottom) and join to preserve structure
+        const sortedLines = Array.from(lineMap.entries())
+          .sort(([yA], [yB]) => yB - yA) // PDF coordinates are top-down
+          .map(([, items]) => items.join(''))
+          .join('\n'); // Use newlines to preserve section boundaries
+        
+        pages.push(sortedLines);
       }
-      return pages.join('\n');
+      return pages.join('\n\n'); // Double newline between pages
     } finally {
       await pdf.destroy();
     }
